@@ -106,17 +106,14 @@ def setup():
 
 class Player:
     def Play(path, file, album = ""):
-        print("Now Playing:", file, "from: ", album)
         pygame.mixer.init()
         pygame.mixer.music.load(path)
         pygame.mixer.music.play()
     
-    def Pause(path,file):
-        print("Paused song:", file)
+    def Pause():
         pygame.mixer.music.pause()
 
-    def Unpause(path,file):
-        print("Unpaused song:", file)
+    def Unpause():
         pygame.mixer.music.unpause()
     
     def ChangeSong(path,file, album):
@@ -174,35 +171,34 @@ def main():
 
             for i in album_dict:
                 for j in album_dict[i]:
-                    songs.append(j)
+                    songs.append(j) # Why load all the songs..? in a list called 'album dictionary'..?
 
             query = input("Enter an album to search for: ")
-            res = search_albums(albums=list(album_dict.keys()), query=query)
+            res = search_albums(list(album_dict.keys()), query=query)
             
             if len(res)>0:
-                print('\nAlbums that match your search term "'+query+'" are:')
+                print("\nAlbums that matched your search:")
                 for i in range(len(res)):
-                    print(str[i]+":",res[i]['file'])
+                    print(str(i)+":",res[i])
 
                 choice = int(input("What album to play? :"))
-            
+                chosenAlbum = res[choice]
+                songList = album_dict[chosenAlbum]
+                if len(songList) > 0:
+                    firstSong = songList[0]
+                    Player.Play(firstSong["path"], firstSong["file"], chosenAlbum)
             else:
                 print("No songs match your search term '"+query+"'")
                 continue
-
-            path = res[choice]['path'] 
-            file = res[choice]['file']
-
-            Player.Play(path,file)
-
+           
             while True:
                 player_option = int(input("\n(1)Pause (2)Play (3)Stop: "))
 
                 if player_option == 1:
-                    Player.Pause(path,file)
+                    Player.Pause()
                 
                 if player_option == 2:
-                    Player.Unpause(path,file)
+                    Player.Unpause()
                 
                 if player_option == 3:
                     Player.Stop()
@@ -250,7 +246,7 @@ def main():
         if opt == "3":
             print()
             print("\nPlaying a random song..")
-            file,path, album = PlayRandomSong(music_folder)
+            file,path, album = PlayRandomSong(album_dict)
             
             Player.Play(path,file, album)
             
