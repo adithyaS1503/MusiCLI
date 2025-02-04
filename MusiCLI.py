@@ -137,7 +137,7 @@ def main():
         album_dict = readCSVCache(CACHE_FILE) 
 
     if not os.path.exists(CACHE_FILE):    
-        music_folder = path
+        # music_folder = path
         album_dict = get_albums(music_folder)
         createCSVCache(album_dict)
 
@@ -182,7 +182,7 @@ def main():
             if len(res)>0:
                 print('\nAlbums that match your search term "'+query+'" are:')
                 for i in range(len(res)):
-                    print(str(i)+":",res[i]['file'])
+                    print(str[i]+":",res[i]['file'])
 
                 choice = int(input("What album to play? :"))
             
