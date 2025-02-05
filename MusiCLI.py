@@ -1,9 +1,9 @@
 '''
 Stuff left for me to do: 
 1. Song list while listening to an album. 
-2. fix playing albums
-3. next and previous tracks with player
-4. random song(s)
+2. fix playing albums - DONE
+3. next and previous tracks with player - DONE
+4. random song(s) - DONE
 5. dynamic sound bar/seek bar - just to show the progression.
 '''
 
@@ -121,10 +121,21 @@ class Player:
         pygame.mixer.init()
         pygame.mixer.music.load(path)
         pygame.mixer.music.play()
+
+    def PlayAlbum(path, file, album = ""):
+        pygame.mixer.init()
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play()
         print("\n==========================================")
         print(f"Currently playing: {file} from {album}")
         print("==========================================")
 
+        Player.current_album = album
+        if album:
+            Player.album_songs = album_dict[album]
+            Player.current_song_index = next(
+                (i for i, song in enumerate(Player.album_songs) if song["file"] == file), None
+            )
 
     def Pause():
         print("Song Paused.")
@@ -143,11 +154,24 @@ class Player:
         pygame.mixer.music.stop()
     
     def Previous():
-        print("Playing Previous Track...")
+        if Player.current_album and Player.album_songs:
+            if Player.current_song_index is not None and Player.current_song_index > 0:
+                Player.current_song_index -= 1
+                prev_song = Player.album_songs[Player.current_song_index]
+                print(f"Playing Previous Track: {prev_song['file']}")
+                Player.PlayAlbum(prev_song["path"], prev_song["file"], Player.current_album)
+            else:
+                print("You're already at the first song in the album.")
 
     def Next():
-        print("Playing Next track...")
-
+        if Player.current_album and Player.album_songs:
+            if Player.current_song_index is not None and Player.current_song_index < len(Player.album_songs) - 1:
+                Player.current_song_index += 1
+                next_song = Player.album_songs[Player.current_song_index]
+                print(f"Playing Next Track: {next_song['file']}")
+                Player.PlayAlbum(next_song["path"], next_song["file"], Player.current_album)
+            else:
+                print("You're already at the last song in the album.")
 def main():
     if not os.path.exists(CONFIG_FILE):
         setup()
@@ -156,6 +180,7 @@ def main():
         path = config_file.read().strip()
     
     if os.path.exists(CACHE_FILE):   
+        global album_dict
         album_dict = readCSVCache(CACHE_FILE) 
 
     if not os.path.exists(CACHE_FILE):    
@@ -164,26 +189,30 @@ def main():
         createCSVCache(album_dict)
 
     print("""
-                    .:-=+#%@@@%               
-            -=+#%%@@@@@%#++-*@%  
-            .@@#+=-:.....:-=+%@% 
-            .@@=:=+*#%@@@@@%#%@% 
-            .@@@@%#*+=-:.    =@% 
-            .@@:             +@% 
-            .@@:             =@% 
-            @@:       .+%@@%%@%  
-        :*#%#*@@:      -@@*--+@@%
-    *@@*=*@@@:      *@%    *@%   
-    :@@:   :@@:      .%@@**%@%-  
-    *@@*=+@@#         -+*#*-     
-        -*%%%*-                  
+            ⠀⠀⠀⢀⣤⠖⠂⠉⠉⠉⠀⠒⠤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⢀⠀⣶⡟⢀⣴⣶⣿⣾⣶⣶⣄⡀⠈⠑⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⡴⣫⣼⡿⣴⡟⠛⠉⠉⠛⠛⠿⣿⣿⣷⣦⡀⠙⢄⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⣼⢁⣟⡟⣷⠁⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣷⣆⠈⢣⡀⠀⠀⠀⠀⠀
+        ⠀⢰⣿⢼⣿⣷⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⡆⠀⢱⠀⠀⠀⠀⠀
+        ⠀⢸⡵⣾⣇⣸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣧⠀⠀⢧⠀⠀⠀⠀
+        ⠀⠘⣴⣿⢯⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⡿⠛⠉⠹⡆⠀⠀⠀
+        ⢀⣼⣿⣧⠟⠁⢀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢯⣴⣶⣴⡇⠀⠀⠀
+        ⢸⣿⣼⣿⣋⣉⠀⠀⠀⠈⠙⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣷⣷⡀⠀⠀
+        ⢸⠁⠊⣿⠛⢛⢟⣦⡀⠀⠀⠀⠈⢆⠀⠀⠀⠀⢀⠔⣨⣶⡜⠂⠈⠽⣧⡀⠀
+        ⠸⣶⣾⡯⠤⢄⡀⠵⢿⣦⡀⠀⠀⠀⡷⡄⠀⡰⢁⣾⣿⣿⣿⠀⠀⠀⣿⡹⡄
+        ⠀⣿⣡⠦⢄⡀⠈⠳⣬⣹⣿⣆⠀⠀⢉⠻⣴⠇⣾⣿⡟⢻⠁⠀⠀⠀⣿⠁⡇
+        ⠀⣿⡭⡀⠀⠈⠲⣦⣸⣿⣿⣿⣧⣀⠈⡔⣜⣴⣿⡟⢀⡎⡈⠀⠀⢰⡿⢠⣷
+        ⠀⢸⣿⣄⣒⡀⡀⣿⣷⡿⣿⢿⣿⣷⡰⡸⣯⣏⣿⡷⢋⣼⣁⡢⢠⠟⠀⣼⣿
+        ⠀⠀⠻⣷⣈⣁⣮⢻⢸⡇⢨⣿⣿⣿⣷⢶⣿⣏⣩⣶⣿⣿⣿⣿⡯⣤⣴⣿⠃
+        ⠀⠀⠀⠘⠿⣿⣿⣽⣽⣷⣿⣿⣿⣿⣿⡶⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+        ⠀⠀⠀⠀⠀⠀⠉⠙⠿⢿⣿⣿⣿⣿⠟⠁⠀⠘⠿⣿⣿⣿⠿⠟⠉⠀⠀⠀⠀
+    
     """)
+    print("\n\n=================================================================================================")
+    print("======================= Welcome to MusiCLi - your python-cli music player =======================")
+    print("=================================================================================================")
 
     while True:
-        print("\n\n=================================================================================================")
-        print("======================= Welcome to MusiCLi - your python-cli music player =======================")
-        print("=================================================================================================")
-
         print("\n1. Search for an album")
         print("2. Search for a song")
         print("3. Play a random song") # I really don't understand the point of this
@@ -198,7 +227,7 @@ def main():
                 for j in album_dict[i]:
                     songs.append(j) 
 
-            query = input("Enter an album to search for: ")
+            query = input("\nEnter an album to search for: ")
             res = search_albums(list(album_dict.keys()), query=query)
             
             if len(res)>0:
@@ -211,7 +240,7 @@ def main():
                 songList = album_dict[chosenAlbum]
                 if len(songList) > 0:
                     firstSong = songList[0]
-                    Player.Play(firstSong["path"], firstSong["file"], chosenAlbum)
+                    Player.PlayAlbum(firstSong["path"], firstSong["file"], chosenAlbum)
             else:
                 print("No songs match your search term '"+query+"'")
                 continue
@@ -230,10 +259,10 @@ def main():
                     break
                 
                 if player_option == 4:
-                    player.Previous()
+                    Player.Previous()
                 
                 if player_option == 5:
-                    player.Next()
+                    Player.Next()
         
         if opt == "2":
             songs = []
@@ -262,6 +291,9 @@ def main():
             Player.Play(path,file)
 
             while True:
+                print("\n==========================================")
+                print(f"Currently playing: {file}")
+                print("==========================================")
                 player_option = int(input("\n(1)Pause (2)Play (3)Stop: "))
 
                 if player_option == 1:
@@ -282,6 +314,9 @@ def main():
             Player.Play(path,file, album)
             
             while True:
+                print("\n==========================================")
+                print(f"Currently playing: {file}")
+                print("==========================================")
                 player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Change Song: "))
 
                 if player_option == 1:
@@ -306,6 +341,8 @@ def main():
 
         if opt == "9":
             break
+
+album_dict = {} # this stupid piece of shit made me create a dummy file and crap
 
 if __name__ == "__main__":
     main()
