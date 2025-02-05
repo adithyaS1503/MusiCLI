@@ -1,11 +1,12 @@
 '''
 Stuff left for me to do: 
-1. Song list while listening to an album. 
+1. Song list while listening to an album. - DONE
 2. fix playing albums - DONE
 3. next and previous tracks with player - DONE
 4. random song(s) - DONE
 5. dynamic sound bar/seek bar - just to show the progression.
 6. Format printing dictionary
+7. autoplay
 '''
 
 import os, pygame
@@ -131,39 +132,24 @@ class Player:
         print(f"Currently playing: {file} from {album}")
         print("==========================================")
 
-        Player.DisplayTrackList(album, file, path)
+        # Displaying track list
+        Player.current_album = album      
 
-        # Player.current_album = album                Player.DisplayTrackList(album, file, path)
-
-        # if album:
-        #     Player.album_songs = album_dict[album]
-        #     Player.current_song_index = next(
-        #         (i for i, song in enumerate(Player.album_songs) if song["file"] == file), None
-        #     )
-
-        # # I copied this shit        
-        # print("\nTracklist: ")
-        # for index, song in enumerate(Player.album_songs):
-        #     if index == Player.current_song_index:
-        #         print(f"{index + 1}. {song['file']} - Now Playing")
-        #     else: 
-        #         print(f"{index + 1}. {song['file']}")
-
-    def DisplayTrackList(album, file, path):
-        Player.current_album = album
         if album:
             Player.album_songs = album_dict[album]
             Player.current_song_index = next(
                 (i for i, song in enumerate(Player.album_songs) if song["file"] == file), None
             )
 
-        # I copied this shit        
         print("\nTracklist: ")
         for index, song in enumerate(Player.album_songs):
             if index == Player.current_song_index:
                 print(f"{index + 1}. {song['file']} - Now Playing")
             else: 
                 print(f"{index + 1}. {song['file']}")
+        
+        # Autoplaying the next track using pygame's event listener
+        pygame.mixer.music.set_endevent(pygame.USEREVENT)
 
     def Pause():
         print("Song Paused.")
@@ -200,6 +186,7 @@ class Player:
                 Player.PlayAlbum(next_song["path"], next_song["file"], Player.current_album)
             else:
                 print("You're already at the last song in the album.")
+
 def main():
     if not os.path.exists(CONFIG_FILE):
         setup()
@@ -277,7 +264,7 @@ def main():
             while True:
                 player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Previous Song (5)Next Song (6)List Albums: "))
 
-                if player_option == 1:
+                if player_option == 1:     
                     Player.Pause()
                 
                 if player_option == 2:
