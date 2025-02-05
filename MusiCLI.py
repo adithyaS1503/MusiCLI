@@ -5,6 +5,7 @@ Stuff left for me to do:
 3. next and previous tracks with player - DONE
 4. random song(s) - DONE
 5. dynamic sound bar/seek bar - just to show the progression.
+6. Format printing dictionary
 '''
 
 import os, pygame
@@ -130,12 +131,39 @@ class Player:
         print(f"Currently playing: {file} from {album}")
         print("==========================================")
 
+        Player.DisplayTrackList(album, file, path)
+
+        # Player.current_album = album                Player.DisplayTrackList(album, file, path)
+
+        # if album:
+        #     Player.album_songs = album_dict[album]
+        #     Player.current_song_index = next(
+        #         (i for i, song in enumerate(Player.album_songs) if song["file"] == file), None
+        #     )
+
+        # # I copied this shit        
+        # print("\nTracklist: ")
+        # for index, song in enumerate(Player.album_songs):
+        #     if index == Player.current_song_index:
+        #         print(f"{index + 1}. {song['file']} - Now Playing")
+        #     else: 
+        #         print(f"{index + 1}. {song['file']}")
+
+    def DisplayTrackList(album, file, path):
         Player.current_album = album
         if album:
             Player.album_songs = album_dict[album]
             Player.current_song_index = next(
                 (i for i, song in enumerate(Player.album_songs) if song["file"] == file), None
             )
+
+        # I copied this shit        
+        print("\nTracklist: ")
+        for index, song in enumerate(Player.album_songs):
+            if index == Player.current_song_index:
+                print(f"{index + 1}. {song['file']} - Now Playing")
+            else: 
+                print(f"{index + 1}. {song['file']}")
 
     def Pause():
         print("Song Paused.")
@@ -216,7 +244,8 @@ def main():
         print("\n1. Search for an album")
         print("2. Search for a song")
         print("3. Play a random song") # I really don't understand the point of this
-        print("4. Refresh Cache")
+        print("4. List albums")
+        print("5. Refresh Cache")
         print("9. Exit")
         opt = input("Enter your option: ")
 
@@ -244,9 +273,9 @@ def main():
             else:
                 print("No songs match your search term '"+query+"'")
                 continue
-           
+
             while True:
-                player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Previous Song (5)Next Song: "))
+                player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Previous Song (5)Next Song (6)List Albums: "))
 
                 if player_option == 1:
                     Player.Pause()
@@ -263,6 +292,9 @@ def main():
                 
                 if player_option == 5:
                     Player.Next()
+
+                if player_option == 6:
+                    print("\nAlbums list: ")
         
         if opt == "2":
             songs = []
@@ -333,7 +365,7 @@ def main():
                     file,path, album = PlayRandomSong(music_folder)
                     Player.ChangeSong(path, file, album)
         
-        if opt == "4":
+        if opt == "5":
             createCSVCache(album_dict)
 
         if opt == 'dict':
