@@ -5,6 +5,26 @@ import pandas as pd
 CONFIG_FILE = "musicli-config.txt"
 CACHE_FILE = "musicli-cache.csv"
 
+def displayIcon():
+     print("""
+                    .:-=+#%@@@%               
+            -=+#%%@@@@@%#++-*@%  
+            .@@#+=-:.....:-=+%@% 
+            .@@=:=+*#%@@@@@%#%@% 
+            .@@@@%#*+=-:.    =@% 
+            .@@:             +@% 
+            .@@:             =@% 
+            @@:       .+%@@%%@%  
+        :*#%#*@@:      -@@*--+@@%
+    *@@*=*@@@:      *@%    *@%   
+    :@@:   :@@:      .%@@**%@%-  
+    *@@*=+@@#         -+*#*-     
+        -*%%%*-                  
+    """)
+
+def playBar():
+    print("WIP")
+
 def get_albums(path):
     albums = {}
     for root, dirs, files in os.walk(path):
@@ -111,9 +131,11 @@ class Player:
         pygame.mixer.music.play()
     
     def Pause():
+        print("Song Paused.")
         pygame.mixer.music.pause()
 
     def Unpause():
+        print("Resumed Song.")
         pygame.mixer.music.unpause()
     
     def ChangeSong(path,file, album):
@@ -121,7 +143,14 @@ class Player:
         Player.Play(path, file, album)
 
     def Stop():
+        print("Stopping Song.")
         pygame.mixer.music.stop()
+    
+    def Previous():
+        print("Playing Previous Track...")
+
+    def Next():
+        print("Playing Next track...")
 
 def main():
     if not os.path.exists(CONFIG_FILE):
@@ -192,7 +221,8 @@ def main():
                 continue
            
             while True:
-                player_option = int(input("\n(1)Pause (2)Play (3)Stop: "))
+                displayIcon()
+                player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Previous Song (5)Next Song: "))
 
                 if player_option == 1:
                     Player.Pause()
@@ -203,6 +233,12 @@ def main():
                 if player_option == 3:
                     Player.Stop()
                     break
+                
+                if player_option == 4:
+                    player.Previous()
+                
+                if player_option == 5:
+                    player.Next()
         
         if opt == "2":
             songs = []
