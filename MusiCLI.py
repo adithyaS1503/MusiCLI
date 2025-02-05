@@ -1,26 +1,18 @@
+'''
+Stuff left for me to do: 
+1. Song list while listening to an album. 
+2. fix playing albums
+3. next and previous tracks with player
+4. random song(s)
+5. dynamic sound bar/seek bar - just to show the progression.
+'''
+
 import os, pygame
 import random as rnd
 import pandas as pd
 
 CONFIG_FILE = "musicli-config.txt"
 CACHE_FILE = "musicli-cache.csv"
-
-def displayIcon():
-     print("""
-                    .:-=+#%@@@%               
-            -=+#%%@@@@@%#++-*@%  
-            .@@#+=-:.....:-=+%@% 
-            .@@=:=+*#%@@@@@%#%@% 
-            .@@@@%#*+=-:.    =@% 
-            .@@:             +@% 
-            .@@:             =@% 
-            @@:       .+%@@%%@%  
-        :*#%#*@@:      -@@*--+@@%
-    *@@*=*@@@:      *@%    *@%   
-    :@@:   :@@:      .%@@**%@%-  
-    *@@*=+@@#         -+*#*-     
-        -*%%%*-                  
-    """)
 
 def playBar():
     print("WIP")
@@ -129,7 +121,11 @@ class Player:
         pygame.mixer.init()
         pygame.mixer.music.load(path)
         pygame.mixer.music.play()
-    
+        print("\n==========================================")
+        print(f"Currently playing: {file} from {album}")
+        print("==========================================")
+
+
     def Pause():
         print("Song Paused.")
         pygame.mixer.music.pause()
@@ -190,7 +186,7 @@ def main():
 
         print("\n1. Search for an album")
         print("2. Search for a song")
-        print("3. Play a random song")
+        print("3. Play a random song") # I really don't understand the point of this
         print("4. Refresh Cache")
         print("9. Exit")
         opt = input("Enter your option: ")
@@ -200,7 +196,7 @@ def main():
 
             for i in album_dict:
                 for j in album_dict[i]:
-                    songs.append(j) # Why load all the songs..? in a list called 'album dictionary'..?
+                    songs.append(j) 
 
             query = input("Enter an album to search for: ")
             res = search_albums(list(album_dict.keys()), query=query)
@@ -221,7 +217,6 @@ def main():
                 continue
            
             while True:
-                displayIcon()
                 player_option = int(input("\n(1)Pause (2)Play (3)Stop (4)Previous Song (5)Next Song: "))
 
                 if player_option == 1:
